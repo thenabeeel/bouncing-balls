@@ -1,0 +1,109 @@
+  <!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #container {
+      position: relative;
+      width: 1000px;
+      height: 800px;
+      background-color: #31054f;
+      border: 1px solid black;
+    }
+    .ball {
+      width: 50px;
+      height: 50px;
+      background-color: blue;
+      position: absolute;
+      border-radius: 50%;
+    }
+    .evilCircle {
+      width: 50px;
+      height: 50px;
+      background-color: green;
+      color: white;
+      position: absolute;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <p>Score: <span id="score">0</span></p>
+
+  <script>
+    const container = document.getElementById("container");
+    const scoreElement = document.getElementById("score");
+    const numBalls = 5;
+    const balls = [];
+    let score = 0;
+
+    const evilCircle = document.createElement("div");
+    evilCircle.classList.add("evilCircle");
+    container.appendChild(evilCircle);
+
+    evilCircle.style.left = "175px";
+    evilCircle.style.top = "175px";
+
+    evilCircle.addEventListener("mousemove", (e) => {
+      evilCircle.style.left = `${e.clientX - 25}px`;
+      evilCircle.style.top = `${e.clientY - 25}px`;
+    });
+
+    for (let i = 0; i < numBalls; i++) {
+      const ball = document.createElement("div");
+      ball.classList.add("ball");
+      container.appendChild(ball);
+      balls.push(ball);
+
+      const speedX = (Math.random() - 1) * 10;
+      const speedY = (Math.random() - 1) * 10;
+
+      ball.style.left = `${Math.random() * 350}px`;
+      ball.style.top = `${Math.random() * 350}px`;
+
+      moveBall(ball, speedX, speedY);
+    }
+
+    function moveBall(ball, speedX, speedY) {
+      const rect = container.getBoundingClientRect();
+
+      let x = parseFloat(ball.style.left) || 0;
+      let y = parseFloat(ball.style.top) || 0;
+
+      const ballInterval = setInterval(() => {
+        x += speedX;
+        y += speedY;
+
+        if (x < 0 || x > rect.width - 50) {
+          speedX *= -1;
+        }
+
+        if (y < 0 || y > rect.height - 50) {
+          speedY *= -1;
+        }
+
+        ball.style.left = `${x}px`;
+        ball.style.top = `${y}px`;
+
+        if (isCollision(evilCircle, ball)) {
+          container.removeChild(ball);
+          clearInterval(ballInterval);
+          score++;
+          scoreElement.textContent = score;
+        }
+      }, 16);
+    }
+
+    function isCollision(circle, ball) {
+      const circleX = parseFloat(circle.style.left) + 25;
+      const circleY = parseFloat(circle.style.top) + 25;
+      const ballX = parseFloat(ball.style.left) + 25;
+      const ballY = parseFloat(ball.style.top) + 25;
+
+      const distance = Math.sqrt((circleX - ballX) ** 2 + (circleY - ballY) ** 2);
+
+      return distance < 25; 
+    }
+  </script>
+</body>
+</html>
